@@ -1,0 +1,62 @@
+﻿@model CreatePaymentPageModel
+
+@{
+    Layout = string.Empty;
+}
+
+<script asp-location="Footer">
+    $(document).ready(function () {
+        $('.payment-info-next-step-button').hide();
+    });
+</script>
+
+@if (!Model.Success)
+{
+    <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+                <p>@T("Plugins.Payments.Ecommpay.FailedOrderCreation")</p>
+            </td>
+        </tr>
+    </table>
+}
+else
+{
+    <style>
+        #ecommpay-payment-container {
+            margin: 0 auto;
+            width: 480px;
+        }
+    </style>
+    <div id="ecommpay-payment-container"></div>
+    <script asp-location="Footer">
+        var EP_HOST = '@Model.BaseUrl';
+
+        $(document).ready(function () {
+            EPayWidget.run(@Json.Serialize(Model.Query));
+
+            $(window).off('message').on('message', function (e) {
+                var data = e.originalEvent.data;
+                if (data) {
+                    var payload = JSON.parse(data);
+                    if (payload.message === 'epframe.payment.success') {
+                        var $nextBtn = $('.payment-info-next-step-button');
+
+                        var timerId = setTimeout(function () {
+                            $nextBtn.click();
+                        }, 5000);
+
+                        $nextBtn.show().click(function () {
+                            clearTimeout(timerId);
+                        });
+                    }
+                }
+            });
+        });
+    </script>
+}
+
+@if (orderSettings.OnePageCheckoutEnabled)
+{
+    @Html.NopInlineScripts(ResourceLocation.Footer)
+}

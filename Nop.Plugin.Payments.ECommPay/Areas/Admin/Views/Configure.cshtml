@@ -1,0 +1,170 @@
+﻿@model ConfigurationModel
+
+@{
+    Layout = "_ConfigurePlugin";
+
+    Html.AppendCssFileParts("~/lib_npm/jquery-tageditor/jquery.tag-editor.css");
+    Html.AppendScriptParts("~/lib_npm/jquery-tageditor/jquery.tag-editor.min.js");
+    Html.AppendScriptParts("~/lib_npm/jquery-tageditor/jquery.caret.min.js");
+}
+
+@await Component.InvokeAsync("StoreScopeConfiguration")
+
+<form asp-controller="EcommpayConfiguration" asp-action="Configure" method="post">
+    <div class="cards-group">
+        <div class="card card-default">
+            <div class="card-body">
+                <div class="form-group row">
+                    <div class="col-md-3">
+                        <nop-override-store-checkbox asp-for="IsTestMode_OverrideForStore" asp-input="IsTestMode" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
+                        <nop-label asp-for="IsTestMode" />
+                    </div>
+                    <div class="col-md-9">
+                        <nop-editor asp-for="IsTestMode" />
+                        <span asp-validation-for="IsTestMode"></span>
+                    </div>
+                </div>
+                <div class="form-group row" id="test-project-id-container">
+                    <div class="col-md-3">
+                        <nop-override-store-checkbox asp-for="TestProjectId_OverrideForStore" asp-input="TestProjectId" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
+                        <nop-label asp-for="TestProjectId" />
+                    </div>
+                    <div class="col-md-9">
+                        <nop-editor asp-for="TestProjectId" asp-required="true" />
+                        <span asp-validation-for="TestProjectId"></span>
+                    </div>
+                </div>
+                <div class="form-group row" id="production-project-id-container">
+                    <div class="col-md-3">
+                        <nop-override-store-checkbox asp-for="ProductionProjectId_OverrideForStore" asp-input="ProductionProjectId" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
+                        <nop-label asp-for="ProductionProjectId" />
+                    </div>
+                    <div class="col-md-9">
+                        <nop-editor asp-for="ProductionProjectId" asp-required="true" />
+                        <span asp-validation-for="ProductionProjectId"></span>
+                    </div>
+                </div>
+                <script>
+                    $(document).ready(function () {
+                        toggleMode();
+                        $("#@Html.IdFor(model => model.IsTestMode)").click(toggleMode);
+                    });
+
+                    function toggleMode() {
+                        if ($('#@Html.IdFor(model => model.IsTestMode)').is(':checked')) {
+                            $('#test-project-id-container').show();
+                            $('#test-secret-key-container').show();
+                            $('#production-project-id-container').hide();
+                            $('#production-secret-key-container').hide();
+                        } else {
+                            $('#test-project-id-container').hide();
+                            $('#test-secret-key-container').hide();
+                            $('#production-project-id-container').show();
+                            $('#production-secret-key-container').show();
+                        }
+                    }
+                </script>
+                <div class="form-group row" id="test-secret-key-container">
+                    <div class="col-md-3">
+                        <nop-override-store-checkbox asp-for="TestSecretKey_OverrideForStore" asp-input="TestSecretKey" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
+                        <nop-label asp-for="TestSecretKey" />
+                    </div>
+                    <div class="col-md-9">
+                        <nop-editor asp-for="TestSecretKey" asp-value="@Model.TestSecretKey" asp-required="true" />
+                        <span asp-validation-for="TestSecretKey"></span>
+                    </div>
+                </div>
+                <div class="form-group row" id="production-secret-key-container">
+                    <div class="col-md-3">
+                        <nop-override-store-checkbox asp-for="ProductionSecretKey_OverrideForStore" asp-input="ProductionSecretKey" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
+                        <nop-label asp-for="ProductionSecretKey" />
+                    </div>
+                    <div class="col-md-9">
+                        <nop-editor asp-for="ProductionSecretKey" asp-value="@Model.ProductionSecretKey" asp-required="true" />
+                        <span asp-validation-for="ProductionSecretKey"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-3">
+                        <nop-override-store-checkbox asp-for="PaymentFlowTypeId_OverrideForStore" asp-input="PaymentFlowTypeId" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
+                        <nop-label asp-for="PaymentFlowTypeId" />
+                    </div>
+                    <div class="col-md-9">
+                        <nop-select asp-for="PaymentFlowTypeId" asp-items="@Model.AvailablePaymentFlowTypes" />
+                        <span asp-validation-for="PaymentFlowTypeId"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-3">
+                        <nop-label asp-for="AdditionalParameterSystemNames" />
+                    </div>
+                    <div class="col-md-9">
+                        <select asp-for="AdditionalParameterSystemNames" asp-items="@Model.AvailableAdditionalParameterSystemNames"></select>
+                        <span asp-validation-for="AdditionalParameterSystemNames"></span>
+                        <script>
+                            $(document).ready(function () {
+                                $("#@Html.IdFor(model => model.AdditionalParameterSystemNames)").kendoMultiSelect({
+                                    autoClose: false,
+                                    filter: "contains",
+                                    select: function (e) {
+                                        var current = this.value();
+
+                                        if (this.dataSource.view()[e.item.index()].value === "0") {
+                                            this.value("");
+                                        }
+                                        else if (current.indexOf("0") !== -1) {
+                                            current = $.grep(current, function (value) {
+                                                return value !== "0";
+                                            });
+
+                                            this.value(current);
+                                        }
+                                    },
+                                    change: function (e) {
+                                        if (this.value().length === 0)
+                                            this.value(["0"]);
+                                    }
+                                });
+                            });
+                        </script>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-3">
+                        <nop-override-store-checkbox asp-for="AdditionalFee_OverrideForStore" asp-input="AdditionalFee" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
+                        <nop-label asp-for="AdditionalFee" />
+                    </div>
+                    <div class="col-md-9">
+                        <nop-editor asp-for="AdditionalFee" />
+                        <span asp-validation-for="AdditionalFee"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-3">
+                        <nop-override-store-checkbox asp-for="AdditionalFeePercentage_OverrideForStore" asp-input="AdditionalFeePercentage" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
+                        <nop-label asp-for="AdditionalFeePercentage" />
+                    </div>
+                    <div class="col-md-9">
+                        <nop-editor asp-for="AdditionalFeePercentage" />
+                        <span asp-validation-for="AdditionalFeePercentage"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-3">
+                        <nop-label asp-for="CallbackEndpoint" />
+                    </div>
+                    <div class="col-md-9" style="margin-top: 7px;">
+                        @Model.CallbackEndpoint
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-9 offset-md-3">
+                        <button type="submit" name="save" class="btn bg-blue">
+                            @T("Admin.Common.Save")
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
