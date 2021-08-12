@@ -164,7 +164,7 @@ namespace Nop.Plugin.Payments.Ecommpay
                 ? (decimal?)refundPaymentRequest.AmountToRefund
                 : null;
 
-            // send refund request and wait for ECommPay response via the webhook request
+            // send refund request and wait for ECOMMPAY response via the webhook request
             var result = await _ecommpayService.RefundOrderAsync(order, amountToRefund);
             if (result.Success)
             {
@@ -274,7 +274,7 @@ namespace Nop.Plugin.Payments.Ecommpay
         /// Install the plugin
         /// </summary>
         /// <returns>The <see cref="Task"/></returns>
-        public async override Task InstallAsync()
+        public override async Task InstallAsync()
         {
             //settings
             await _settingService.SaveSettingAsync(new EcommpayPaymentSettings
@@ -294,36 +294,27 @@ namespace Nop.Plugin.Payments.Ecommpay
             {
                 ["Enums.Nop.Plugin.Payments.Ecommpay.Domain.PaymentFlowType.NewBrowserTab"] = "Open Payment Page in a separate browser tab",
                 ["Enums.Nop.Plugin.Payments.Ecommpay.Domain.PaymentFlowType.Iframe"] = "Open Payment Page embedded in a checkout",
-                ["Plugins.Payments.Ecommpay.AdditionalParameters.Customer.PersonalData"] = "Customer personal data",
-                ["Plugins.Payments.Ecommpay.AdditionalParameters.Customer.BillingAddress"] = "Customer billing data",
                 ["Plugins.Payments.Ecommpay.Fields.CallbackEndpoint"] = "Callback endpoint",
-                ["Plugins.Payments.Ecommpay.Fields.CallbackEndpoint.Hint"] = "The URL to receive callbacks about transactions. Provide it to the ECommPay specialists during integration.",
+                ["Plugins.Payments.Ecommpay.Fields.CallbackEndpoint.Hint"] = "The URL to receive callbacks about transactions. Provide it to the ECOMMPAY specialists during integration.",
                 ["Plugins.Payments.Ecommpay.Fields.IsTestMode"] = "Test mode",
                 ["Plugins.Payments.Ecommpay.Fields.IsTestMode.Hint"] = "Determine whether to use the test environment.",
-                ["Plugins.Payments.Ecommpay.Fields.TestProjectId"] = "Test project ID",
-                ["Plugins.Payments.Ecommpay.Fields.TestProjectId.Hint"] = "Enter the project ID provided by ECOMMPAY for testing purposes.",
-                ["Plugins.Payments.Ecommpay.Fields.TestProjectId.Required"] = "The test project ID is required.",
-                ["Plugins.Payments.Ecommpay.Fields.TestProjectId.ShouldBeNumeric"] = "The test project ID must be numeric.",
                 ["Plugins.Payments.Ecommpay.Fields.ProductionProjectId"] = "Production project ID",
                 ["Plugins.Payments.Ecommpay.Fields.ProductionProjectId.Hint"] = "Enter the project ID provided by ECOMMPAY for production environment.",
                 ["Plugins.Payments.Ecommpay.Fields.ProductionProjectId.Required"] = "The production project ID is required.",
                 ["Plugins.Payments.Ecommpay.Fields.ProductionProjectId.ShouldBeNumeric"] = "The production project ID must be numeric.",
-                ["Plugins.Payments.Ecommpay.Fields.TestSecretKey"] = "Test secret key",
-                ["Plugins.Payments.Ecommpay.Fields.TestSecretKey.Hint"] = "Enter the secret key provided by ECOMMPAY for testing purposes.",
-                ["Plugins.Payments.Ecommpay.Fields.TestSecretKey.Required"] = "The test secret key is required.",
                 ["Plugins.Payments.Ecommpay.Fields.ProductionSecretKey"] = "Production secret key",
                 ["Plugins.Payments.Ecommpay.Fields.ProductionSecretKey.Hint"] = "Enter the secret key provided by ECOMMPAY for production environment.",
                 ["Plugins.Payments.Ecommpay.Fields.ProductionSecretKey.Required"] = "The production secret key is required.",
                 ["Plugins.Payments.Ecommpay.Fields.PaymentFlowTypeId"] = "Payment flow",
                 ["Plugins.Payments.Ecommpay.Fields.PaymentFlowTypeId.Hint"] = "Select the payment flow type for users in checkout.",
-                ["Plugins.Payments.Ecommpay.Fields.AdditionalParameterSystemNames"] = "Additional parameters",
-                ["Plugins.Payments.Ecommpay.Fields.AdditionalParameterSystemNames.Hint"] = "Select the additional parameters to pass to the ECOMMPAY.",
+                ["Plugins.Payments.Ecommpay.Fields.AdditionalParameters"] = "Additional parameters",
+                ["Plugins.Payments.Ecommpay.Fields.AdditionalParameters.Hint"] = "When specifying two or more parameters, they must be entered with '&' as separator. For example: 'language_code=en&currency=eur'. A list of these parameters is available at the link https://developers.ecommpay.com/en/en_PP_Parameters.html.",
                 ["Plugins.Payments.Ecommpay.Fields.AdditionalFee"] = "Additional fee",
                 ["Plugins.Payments.Ecommpay.Fields.AdditionalFee.Hint"] = "Enter additional fee to charge your customers.",
                 ["Plugins.Payments.Ecommpay.Fields.AdditionalFeePercentage"] = "Additional fee. Use percentage",
                 ["Plugins.Payments.Ecommpay.Fields.AdditionalFeePercentage.Hint"] = "Determines whether to apply a percentage additional fee to the order total. If not enabled, a fixed value is used.",
                 ["Plugins.Payments.Ecommpay.FailedOrderCreation"] = "Error when processing the payment transaction. Please try again or contact with store owner.",
-                ["Plugins.Payments.Ecommpay.PaymentMethodDescription"] = "Pay by ECommPay",
+                ["Plugins.Payments.Ecommpay.PaymentMethodDescription"] = "Pay by ECOMMPAY",
                 ["Plugins.Payments.Ecommpay.RefundIsCreated"] = "Refund request is sended. The refund performing period depends on the issuing bank and may take a long time. The request result will be displayed in the order notes.",
             });
 

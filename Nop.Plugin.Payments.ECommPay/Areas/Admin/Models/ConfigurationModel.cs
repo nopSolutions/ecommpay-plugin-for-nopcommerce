@@ -23,26 +23,11 @@ namespace Nop.Plugin.Payments.Ecommpay.Areas.Admin.Models
         public bool IsTestMode_OverrideForStore { get; set; }
 
         /// <summary>
-        /// Gets or sets a test project ID 
-        /// </summary>
-        [NopResourceDisplayName("Plugins.Payments.Ecommpay.Fields.TestProjectId")]
-        public string TestProjectId { get; set; }
-        public bool TestProjectId_OverrideForStore { get; set; }
-
-        /// <summary>
         /// Gets or sets a production project ID
         /// </summary>
         [NopResourceDisplayName("Plugins.Payments.Ecommpay.Fields.ProductionProjectId")]
         public string ProductionProjectId { get; set; }
         public bool ProductionProjectId_OverrideForStore { get; set; }
-
-        /// <summary>
-        /// Gets or sets a test secret key 
-        /// </summary>
-        [DataType(DataType.Password)]
-        [NopResourceDisplayName("Plugins.Payments.Ecommpay.Fields.TestSecretKey")]
-        public string TestSecretKey { get; set; }
-        public bool TestSecretKey_OverrideForStore { get; set; }
 
         /// <summary>
         /// Gets or sets a production secret key 
@@ -65,16 +50,11 @@ namespace Nop.Plugin.Payments.Ecommpay.Areas.Admin.Models
         public IList<SelectListItem> AvailablePaymentFlowTypes { get; set; }
 
         /// <summary>
-        /// Gets or sets the additional parameter system names to pass to the ECOMMPAY
+        /// Gets or sets the additional parameters to pass to the ECOMMPAY
         /// </summary>
-        [NopResourceDisplayName("Plugins.Payments.Ecommpay.Fields.AdditionalParameterSystemNames")]
-        public IList<string> AdditionalParameterSystemNames { get; set; }
-        public bool AdditionalParameterSystemNames_OverrideForStore { get; set; }
-
-        /// <summary>
-        /// Gets or sets the available additional parameter system names
-        /// </summary>
-        public IList<SelectListItem> AvailableAdditionalParameterSystemNames { get; set; }
+        [NopResourceDisplayName("Plugins.Payments.Ecommpay.Fields.AdditionalParameters")]
+        public string AdditionalParameters { get; set; }
+        public bool AdditionalParameters_OverrideForStore { get; set; }
 
         /// <summary>
         /// Gets or sets an additional fee
@@ -99,9 +79,7 @@ namespace Nop.Plugin.Payments.Ecommpay.Areas.Admin.Models
 
         public ConfigurationModel()
         {
-            AdditionalParameterSystemNames = new List<string>();
             AvailablePaymentFlowTypes = new List<SelectListItem>();
-            AvailableAdditionalParameterSystemNames = new List<SelectListItem>();
         }
 
         #endregion

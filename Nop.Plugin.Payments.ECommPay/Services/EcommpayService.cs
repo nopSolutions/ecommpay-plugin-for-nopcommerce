@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.WebUtilities;
 using Newtonsoft.Json;
 using Nop.Core;
 using Nop.Core.Domain.Common;
@@ -123,8 +124,6 @@ namespace Nop.Plugin.Payments.Ecommpay.Services
             var validationResult = await validator.ValidateAsync(new ConfigurationModel
             {
                 IsTestMode = _ecommpayPaymentSettings.IsTestMode,
-                TestProjectId = _ecommpayPaymentSettings.TestProjectId.ToString(),
-                TestSecretKey = _ecommpayPaymentSettings.TestSecretKey,
                 ProductionProjectId = _ecommpayPaymentSettings.ProductionProjectId.ToString(),
                 ProductionSecretKey = _ecommpayPaymentSettings.ProductionSecretKey,
             });
@@ -265,7 +264,7 @@ namespace Nop.Plugin.Payments.Ecommpay.Services
                 General = new RefundGeneralPayload
                 {
                     ProjectId = _ecommpayPaymentSettings.IsTestMode
-                        ? _ecommpayPaymentSettings.TestProjectId
+                        ? Defaults.TestProjectId
                         : _ecommpayPaymentSettings.ProductionProjectId,
                     PaymentId = order.CaptureTransactionId,
                 },
@@ -455,118 +454,126 @@ namespace Nop.Plugin.Payments.Ecommpay.Services
 
             if (model.Errors.Count > 0)
                 return;
-            
+
             model.Query.Add(new("payment_currency", storeCurrency.CurrencyCode));
-            model.Query.Add(new("project_id", _ecommpayPaymentSettings.IsTestMode 
-                ? _ecommpayPaymentSettings.TestProjectId.ToString()
+            model.Query.Add(new("project_id", _ecommpayPaymentSettings.IsTestMode
+                ? Defaults.TestProjectId.ToString()
                 : _ecommpayPaymentSettings.ProductionProjectId.ToString()));
-            model.Query.Add(new("card_operation_type", "sale"));        
+            model.Query.Add(new("card_operation_type", "sale"));
         }
 
         private async Task PrepareAdditionalParametersAsync(CreatePaymentPageModel model, Address billingAddress, Customer customer)
         {
-            if (_ecommpayPaymentSettings.AdditionalParameterSystemNames?.Any() == true)
+            //customer details
+            if (customer != null)
             {
-                foreach (var parameterSystemName in _ecommpayPaymentSettings.AdditionalParameterSystemNames)
+                model.Query.Add(new("customer_email", customer.Email));
+
+                if (_customerSettings.FirstNameEnabled)
                 {
-                    if (parameterSystemName == Defaults.ECommPay.AdditionalParameters.Customer.PersonalData.SystemName)
+                    var firstName = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.FirstNameAttribute);
+                    if (!string.IsNullOrWhiteSpace(firstName))
+                        model.Query.Add(new("customer_first_name", firstName));
+                }
+
+                if (_customerSettings.LastNameEnabled)
+                {
+                    var lastName = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.LastNameAttribute);
+                    if (!string.IsNullOrWhiteSpace(lastName))
+                        model.Query.Add(new("customer_last_name", lastName));
+                }
+
+                if (_customerSettings.PhoneEnabled)
+                {
+                    var phone = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.PhoneAttribute);
+                    if (!string.IsNullOrWhiteSpace(phone))
+                        model.Query.Add(new("customer_phone", phone));
+                }
+
+                if (_customerSettings.DateOfBirthEnabled)
+                {
+                    var dateOfBirthRaw = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.DateOfBirthAttribute);
+                    if (DateTime.TryParse(dateOfBirthRaw, out var dateOfBirth))
+                        model.Query.Add(new("customer_day_of_birth", dateOfBirth.ToString("dd-MM-yyyy")));
+                }
+
+                if (_customerSettings.CountryEnabled)
+                {
+                    var countryId = await _genericAttributeService.GetAttributeAsync<int>(customer, NopCustomerDefaults.CountryIdAttribute);
+                    var country = await _countryService.GetCountryByIdAsync(countryId);
+                    if (country != null)
+                        model.Query.Add(new("customer_country", country.TwoLetterIsoCode));
+                }
+
+                if (_customerSettings.StateProvinceEnabled)
+                {
+                    var stateProvinceId = await _genericAttributeService.GetAttributeAsync<int>(customer, NopCustomerDefaults.StateProvinceIdAttribute);
+                    var stateProvince = await _stateProvinceService.GetStateProvinceByIdAsync(stateProvinceId);
+                    if (stateProvince != null)
+                        model.Query.Add(new("customer_state", stateProvince.Name));
+                }
+
+                if (_customerSettings.CityEnabled)
+                {
+                    var city = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.CityAttribute);
+                    if (!string.IsNullOrWhiteSpace(city))
+                        model.Query.Add(new("customer_city", city));
+                }
+
+                if (_customerSettings.StreetAddressEnabled)
+                {
+                    var streetAddress = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.StreetAddressAttribute);
+                    if (!string.IsNullOrWhiteSpace(streetAddress))
+                        model.Query.Add(new("customer_address", streetAddress));
+                }
+
+                if (_customerSettings.ZipPostalCodeEnabled)
+                {
+                    var zipPostalCode = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.ZipPostalCodeAttribute);
+                    if (!string.IsNullOrWhiteSpace(zipPostalCode))
+                        model.Query.Add(new("customer_zip", zipPostalCode));
+                }
+            }
+
+            //billing address details
+            if (billingAddress != null)
+            {
+                if (billingAddress.CountryId.HasValue)
+                {
+                    var billingCountry = await _countryService.GetCountryByIdAsync(billingAddress.CountryId.Value);
+                    if (billingCountry != null)
+                        model.Query.Add(new("billing_country", billingCountry.TwoLetterIsoCode));
+                }
+
+                if (billingAddress.StateProvinceId.HasValue)
+                {
+                    var billingStateProvince = await _stateProvinceService.GetStateProvinceByIdAsync(billingAddress.StateProvinceId.Value);
+                    if (billingStateProvince != null)
+                        model.Query.Add(new("billing_region_code", billingStateProvince.Abbreviation));
+                }
+
+                if (!string.IsNullOrWhiteSpace(billingAddress.City))
+                    model.Query.Add(new("billing_city", billingAddress.City));
+
+                if (!string.IsNullOrWhiteSpace(billingAddress.Address1))
+                    model.Query.Add(new("billing_address", billingAddress.Address1));
+
+                if (!string.IsNullOrWhiteSpace(billingAddress.ZipPostalCode))
+                    model.Query.Add(new("billing_postal", billingAddress.ZipPostalCode));
+            }
+
+            //additional parameters
+            if (!string.IsNullOrEmpty(_ecommpayPaymentSettings.AdditionalParameters))
+            {
+                try
+                {
+                    var additionalParameters = QueryHelpers.ParseQuery(_ecommpayPaymentSettings.AdditionalParameters);
+                    foreach (var param in additionalParameters)
                     {
-                        model.Query.Add(new("customer_email", customer.Email));
-
-                        if (_customerSettings.FirstNameEnabled)
-                        {
-                            var firstName = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.FirstNameAttribute);
-                            if (!string.IsNullOrWhiteSpace(firstName))
-                                model.Query.Add(new("customer_first_name", firstName));
-                        }
-
-                        if (_customerSettings.LastNameEnabled)
-                        {
-                            var lastName = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.LastNameAttribute);
-                            if (!string.IsNullOrWhiteSpace(lastName))
-                                model.Query.Add(new("customer_last_name", lastName));
-                        }
-
-                        if (_customerSettings.PhoneEnabled)
-                        {
-                            var phone = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.PhoneAttribute);
-                            if (!string.IsNullOrWhiteSpace(phone))
-                                model.Query.Add(new("customer_phone", phone));
-                        }
-
-                        if (_customerSettings.DateOfBirthEnabled)
-                        {
-                            var dateOfBirthRaw = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.DateOfBirthAttribute);
-                            if (DateTime.TryParse(dateOfBirthRaw, out var dateOfBirth))
-                                model.Query.Add(new("customer_day_of_birth", dateOfBirth.ToString("dd-MM-yyyy")));
-                        }
-
-                        if (_customerSettings.CountryEnabled)
-                        {
-                            var countryId = await _genericAttributeService.GetAttributeAsync<int>(customer, NopCustomerDefaults.CountryIdAttribute);
-                            var country = await _countryService.GetCountryByIdAsync(countryId);
-                            if (country != null)
-                                model.Query.Add(new("customer_country", country.TwoLetterIsoCode));
-                        }
-
-                        if (_customerSettings.StateProvinceEnabled)
-                        {
-                            var stateProvinceId = await _genericAttributeService.GetAttributeAsync<int>(customer, NopCustomerDefaults.StateProvinceIdAttribute);
-                            var stateProvince = await _stateProvinceService.GetStateProvinceByIdAsync(stateProvinceId);
-                            if (stateProvince != null)
-                                model.Query.Add(new("customer_state", stateProvince.Name));
-                        }
-
-                        if (_customerSettings.CityEnabled)
-                        {
-                            var city = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.CityAttribute);
-                            if (!string.IsNullOrWhiteSpace(city))
-                                model.Query.Add(new("customer_city", city));
-                        }
-
-                        if (_customerSettings.StreetAddressEnabled)
-                        {
-                            var streetAddress = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.StreetAddressAttribute);
-                            if (!string.IsNullOrWhiteSpace(streetAddress))
-                                model.Query.Add(new("customer_address", streetAddress));
-                        }
-
-                        if (_customerSettings.ZipPostalCodeEnabled)
-                        {
-                            var zipPostalCode = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.ZipPostalCodeAttribute);
-                            if (!string.IsNullOrWhiteSpace(zipPostalCode))
-                                model.Query.Add(new("customer_zip", zipPostalCode));
-                        }
-                    }
-                    else if (parameterSystemName == Defaults.ECommPay.AdditionalParameters.Customer.BillingAddress.SystemName)
-                    {
-                        if (billingAddress != null)
-                        {
-                            if (billingAddress.CountryId.HasValue)
-                            {
-                                var billingCountry = await _countryService.GetCountryByIdAsync(billingAddress.CountryId.Value);
-                                if (billingCountry != null)
-                                    model.Query.Add(new("billing_country", billingCountry.TwoLetterIsoCode));
-                            }
-
-                            if (billingAddress.StateProvinceId.HasValue)
-                            {
-                                var billingStateProvince = await _stateProvinceService.GetStateProvinceByIdAsync(billingAddress.StateProvinceId.Value);
-                                if (billingStateProvince != null)
-                                    model.Query.Add(new("billing_region_code", billingStateProvince.Abbreviation));
-                            }
-
-                            if (!string.IsNullOrWhiteSpace(billingAddress.City))
-                                model.Query.Add(new("billing_city", billingAddress.City));
-
-                            if (!string.IsNullOrWhiteSpace(billingAddress.Address1))
-                                model.Query.Add(new("billing_address", billingAddress.Address1));
-
-                            if (!string.IsNullOrWhiteSpace(billingAddress.ZipPostalCode))
-                                model.Query.Add(new("billing_postal", billingAddress.ZipPostalCode));
-                        }
+                        model.Query.TryAdd(param.Key, param.Value);
                     }
                 }
+                catch { }
             }
         }
 
@@ -588,7 +595,7 @@ namespace Nop.Plugin.Payments.Ecommpay.Services
         private string GetSecretKey()
         {
             return _ecommpayPaymentSettings.IsTestMode
-                ? _ecommpayPaymentSettings.TestSecretKey
+                ? Defaults.TestSecretKey
                 : _ecommpayPaymentSettings.ProductionSecretKey;
         }
 

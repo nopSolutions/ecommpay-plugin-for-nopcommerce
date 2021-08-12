@@ -14,21 +14,6 @@ namespace Nop.Plugin.Payments.Ecommpay.Areas.Admin.Validators
 
         public ConfigurationModelValidator(ILocalizationService localizationService)
         {
-            RuleFor(model => model.TestProjectId)
-                .NotEmpty()
-                .WithMessageAwait(localizationService.GetResourceAsync("Plugins.Payments.Ecommpay.Fields.TestProjectId.Required"))
-                .When(model => model.IsTestMode);
-
-            RuleFor(model => model.TestProjectId)
-                .Must(value => int.TryParse(value, out _))
-                .WithMessageAwait(localizationService.GetResourceAsync("Plugins.Payments.Ecommpay.Fields.TestProjectId.ShouldBeNumeric"))
-                .When(model => model.IsTestMode);
-
-            RuleFor(model => model.TestSecretKey)
-                .NotEmpty()
-                .WithMessageAwait(localizationService.GetResourceAsync("Plugins.Payments.Ecommpay.Fields.TestSecretKey.Required"))
-                .When(model => model.IsTestMode);
-
             RuleFor(model => model.ProductionProjectId)
                 .NotEmpty()
                 .WithMessageAwait(localizationService.GetResourceAsync("Plugins.Payments.Ecommpay.Fields.ProductionProjectId.Required"))

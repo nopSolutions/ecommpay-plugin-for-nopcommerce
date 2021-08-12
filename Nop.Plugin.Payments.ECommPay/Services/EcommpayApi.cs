@@ -8,7 +8,7 @@ using Nop.Plugin.Payments.ECommPay.Models;
 namespace Nop.Plugin.Payments.ECommPay.Services
 {
     /// <summary>
-    /// Provides an default implementation of the HTTP client to interact with the ECommPay endpoints
+    /// Provides an default implementation of the HTTP client to interact with the ECOMMPAY endpoints
     /// </summary>
     public class EcommpayApi : BaseHttpClient
     {

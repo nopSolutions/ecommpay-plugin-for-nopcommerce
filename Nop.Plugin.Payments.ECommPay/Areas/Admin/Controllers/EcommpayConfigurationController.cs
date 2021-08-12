@@ -1,7 +1,5 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core;
 using Nop.Plugin.Payments.Ecommpay.Areas.Admin.Models;
 using Nop.Plugin.Payments.Ecommpay.Domain;
@@ -73,12 +71,10 @@ namespace Nop.Plugin.Payments.Ecommpay.Areas.Admin.Controllers
             {
                 ActiveStoreScopeConfiguration = storeScope,
                 IsTestMode = ecommpayPaymentSettings.IsTestMode,
-                TestProjectId = ecommpayPaymentSettings.TestProjectId.ToString(),
-                TestSecretKey = ecommpayPaymentSettings.TestSecretKey,
                 ProductionProjectId = ecommpayPaymentSettings.ProductionProjectId.ToString(),
                 ProductionSecretKey = ecommpayPaymentSettings.ProductionSecretKey,
                 PaymentFlowTypeId = (int)ecommpayPaymentSettings.PaymentFlowType,
-                AdditionalParameterSystemNames = ecommpayPaymentSettings.AdditionalParameterSystemNames,
+                AdditionalParameters = ecommpayPaymentSettings.AdditionalParameters,
                 AdditionalFee = ecommpayPaymentSettings.AdditionalFee,
                 AdditionalFeePercentage = ecommpayPaymentSettings.AdditionalFeePercentage,
             };
@@ -92,18 +88,13 @@ namespace Nop.Plugin.Payments.Ecommpay.Areas.Admin.Controllers
             foreach (var paymentFlowType in availablePaymentFlowTypes)
                 model.AvailablePaymentFlowTypes.Add(paymentFlowType);
 
-            foreach (var parameter in Defaults.ECommPay.AdditionalParameters.All)
-                model.AvailableAdditionalParameterSystemNames.Add(new SelectListItem(await _localizationService.GetResourceAsync(parameter.LocaleName), parameter.SystemName.ToString()));
-
             if (storeScope > 0)
             {
                 model.IsTestMode_OverrideForStore = await _settingService.SettingExistsAsync(ecommpayPaymentSettings, x => x.IsTestMode, storeScope);
-                model.TestProjectId_OverrideForStore = await _settingService.SettingExistsAsync(ecommpayPaymentSettings, x => x.TestProjectId, storeScope);
-                model.TestSecretKey_OverrideForStore = await _settingService.SettingExistsAsync(ecommpayPaymentSettings, x => x.TestSecretKey, storeScope);
                 model.ProductionProjectId_OverrideForStore = await _settingService.SettingExistsAsync(ecommpayPaymentSettings, x => x.ProductionProjectId, storeScope);
                 model.ProductionSecretKey_OverrideForStore = await _settingService.SettingExistsAsync(ecommpayPaymentSettings, x => x.ProductionSecretKey, storeScope);
                 model.PaymentFlowTypeId_OverrideForStore = await _settingService.SettingExistsAsync(ecommpayPaymentSettings, x => x.PaymentFlowType, storeScope);
-                model.AdditionalParameterSystemNames_OverrideForStore = await _settingService.SettingExistsAsync(ecommpayPaymentSettings, x => x.AdditionalParameterSystemNames, storeScope);
+                model.AdditionalParameters_OverrideForStore = await _settingService.SettingExistsAsync(ecommpayPaymentSettings, x => x.AdditionalParameters, storeScope);
                 model.AdditionalFee_OverrideForStore = await _settingService.SettingExistsAsync(ecommpayPaymentSettings, x => x.AdditionalFee, storeScope);
                 model.AdditionalFeePercentage_OverrideForStore = await _settingService.SettingExistsAsync(ecommpayPaymentSettings, x => x.AdditionalFeePercentage, storeScope);
             }
@@ -131,12 +122,10 @@ namespace Nop.Plugin.Payments.Ecommpay.Areas.Admin.Controllers
 
             //save settings
             ecommpayPaymentSettings.IsTestMode = model.IsTestMode;
-            ecommpayPaymentSettings.TestProjectId = int.Parse(model.TestProjectId);
-            ecommpayPaymentSettings.TestSecretKey = model.TestSecretKey;
             ecommpayPaymentSettings.ProductionProjectId = int.Parse(model.ProductionProjectId);
             ecommpayPaymentSettings.ProductionSecretKey = model.ProductionSecretKey;
             ecommpayPaymentSettings.PaymentFlowType = (PaymentFlowType)model.PaymentFlowTypeId;
-            ecommpayPaymentSettings.AdditionalParameterSystemNames = model.AdditionalParameterSystemNames.ToList();
+            ecommpayPaymentSettings.AdditionalParameters = model.AdditionalParameters;
             ecommpayPaymentSettings.AdditionalFee = model.AdditionalFee;
             ecommpayPaymentSettings.AdditionalFeePercentage = model.AdditionalFeePercentage;
 
@@ -144,12 +133,10 @@ namespace Nop.Plugin.Payments.Ecommpay.Areas.Admin.Controllers
              * This behavior can increase performance because cached settings will not be cleared 
              * and loaded from database after each update */
             await _settingService.SaveSettingOverridablePerStoreAsync(ecommpayPaymentSettings, x => x.IsTestMode, model.IsTestMode_OverrideForStore, storeScope, false);
-            await _settingService.SaveSettingOverridablePerStoreAsync(ecommpayPaymentSettings, x => x.TestProjectId, model.TestProjectId_OverrideForStore, storeScope, false);
-            await _settingService.SaveSettingOverridablePerStoreAsync(ecommpayPaymentSettings, x => x.TestSecretKey, model.TestSecretKey_OverrideForStore, storeScope, false);
             await _settingService.SaveSettingOverridablePerStoreAsync(ecommpayPaymentSettings, x => x.ProductionProjectId, model.ProductionProjectId_OverrideForStore, storeScope, false);
             await _settingService.SaveSettingOverridablePerStoreAsync(ecommpayPaymentSettings, x => x.ProductionSecretKey, model.ProductionSecretKey_OverrideForStore, storeScope, false);
             await _settingService.SaveSettingOverridablePerStoreAsync(ecommpayPaymentSettings, x => x.PaymentFlowType, model.PaymentFlowTypeId_OverrideForStore, storeScope, false);
-            await _settingService.SaveSettingOverridablePerStoreAsync(ecommpayPaymentSettings, x => x.AdditionalParameterSystemNames, model.AdditionalParameterSystemNames_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(ecommpayPaymentSettings, x => x.AdditionalParameters, model.AdditionalParameters_OverrideForStore, storeScope, false);
             await _settingService.SaveSettingOverridablePerStoreAsync(ecommpayPaymentSettings, x => x.AdditionalFee, model.AdditionalFee_OverrideForStore, storeScope, false);
             await _settingService.SaveSettingOverridablePerStoreAsync(ecommpayPaymentSettings, x => x.AdditionalFeePercentage, model.AdditionalFeePercentage_OverrideForStore, storeScope, false);
 

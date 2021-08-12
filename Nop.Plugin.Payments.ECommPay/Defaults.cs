@@ -13,6 +13,16 @@ namespace Nop.Plugin.Payments.Ecommpay
         public static string SystemName => "Payments.Ecommpay";
 
         /// <summary>
+        /// Gets the test project id
+        /// </summary>
+        public static int TestProjectId => 34621;
+
+        /// <summary>
+        /// Gets the test secret key
+        /// </summary>
+        public static string TestSecretKey => "0ae30edc5b317d219e32308904e781155c406534b06dc0d5d5a0392946d0a74246d98c5674bec877590346e670836385ae83a9e4e4f1dbee2423fda83acd0d6c";
+
+        /// <summary>
         /// Gets the session key to get process payment request
         /// </summary>
         public static string PaymentRequestSessionKey => "OrderPaymentInfo";
@@ -31,7 +41,7 @@ namespace Nop.Plugin.Payments.Ecommpay
         /// Gets the order details route name
         /// </summary>
         public static string OrderDetailsRouteName => "OrderDetails";
-        
+
         /// <summary>
         /// Gets the checkout completed route name
         /// </summary>
@@ -62,37 +72,6 @@ namespace Nop.Plugin.Payments.Ecommpay
         /// </summary>
         public static class ECommPay
         {
-            /// <summary>
-            /// Represents a additional parameters defaults
-            /// </summary>
-            public static class AdditionalParameters
-            {
-                /// <summary>
-                /// Gets the all available parameters
-                /// </summary>
-                public static (string LocaleName, string SystemName)[] All => new[]
-                {
-                    Customer.PersonalData, 
-                    Customer.BillingAddress
-                };
-
-                /// <summary>
-                /// Represents a customer parameters defaults
-                /// </summary>
-                public static class Customer
-                {
-                    /// <summary>
-                    /// Gets the personal data parameter
-                    /// </summary>
-                    public static (string LocaleName, string SystemName) PersonalData => ("Plugins.Payments.Ecommpay.AdditionalParameters.Customer.PersonalData", "customer.personaldata");
-
-                    /// <summary>
-                    /// Gets the billing address parameter
-                    /// </summary>
-                    public static (string LocaleName, string SystemName) BillingAddress => ("Plugins.Payments.Ecommpay.AdditionalParameters.Customer.BillingAddress", "customer.billingaddress");
-                }
-            }
-
             /// <summary>
             /// Represents a widget defaults
             /// </summary>

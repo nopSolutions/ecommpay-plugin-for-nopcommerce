@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 namespace Nop.Plugin.Payments.ECommPay.Helpers
 {
     /// <summary>
-    /// Represents an helper class to sign the data for the ECommPay requests.
+    /// Represents an helper class to sign the data for the ECOMMPAY requests.
     /// </summary>
     public static class Signer
     {

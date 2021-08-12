@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Nop.Core.Configuration;
+﻿using Nop.Core.Configuration;
 using Nop.Plugin.Payments.Ecommpay.Domain;
 
 namespace Nop.Plugin.Payments.Ecommpay
@@ -17,19 +16,9 @@ namespace Nop.Plugin.Payments.Ecommpay
         public bool IsTestMode { get; set; }
 
         /// <summary>
-        /// Gets or sets a test project ID 
-        /// </summary>
-        public int TestProjectId { get; set; }
-
-        /// <summary>
         /// Gets or sets a production project ID
         /// </summary>
         public int ProductionProjectId { get; set; }
-
-        /// <summary>
-        /// Gets or sets a test secret key 
-        /// </summary>
-        public string TestSecretKey { get; set; }
 
         /// <summary>
         /// Gets or sets a production secret key 
@@ -37,9 +26,9 @@ namespace Nop.Plugin.Payments.Ecommpay
         public string ProductionSecretKey { get; set; }
 
         /// <summary>
-        /// Gets or sets the additional parameter system names to pass to the ECOMMPAY
+        /// Gets or sets the additional parameters to pass to the ECOMMPAY
         /// </summary>
-        public List<string> AdditionalParameterSystemNames { get; set; }
+        public string AdditionalParameters { get; set; }
 
         /// <summary>
         /// Gets or sets a payment flow type
