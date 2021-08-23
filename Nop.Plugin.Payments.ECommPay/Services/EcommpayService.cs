@@ -177,7 +177,7 @@ namespace Nop.Plugin.Payments.Ecommpay.Services
             model.BaseUrl = Defaults.ECommPay.PaymentPage.Host;
 
             model.Query.Add(new("customer_id", customer.Id.ToString()));
-            model.Query.Add(new("customer_account_number", customer.Email));
+            model.Query.Add(new("customer_account_number", customer.Email ?? string.Empty));
             model.Query.Add(new("payment_id", processPaymentRequest.OrderGuid.ToString()));
             model.Query.Add(new("payment_amount", paymentAmount.ToString(CultureInfo.InvariantCulture)));
             model.Query.Add(new("target_element", Defaults.ECommPay.PaymentPage.ContainerName));
@@ -219,7 +219,7 @@ namespace Nop.Plugin.Payments.Ecommpay.Services
             model.BaseUrl = Defaults.ECommPay.PaymentPage.Url;
 
             model.Query.Add(new("customer_id", customer.Id.ToString()));
-            model.Query.Add(new("customer_account_number", customer.Email));
+            model.Query.Add(new("customer_account_number", customer.Email ?? string.Empty));
             model.Query.Add(new("payment_id", order.OrderGuid.ToString()));
             model.Query.Add(new("payment_amount", ((int)(order.OrderTotal * 100)).ToString(CultureInfo.InvariantCulture)));
             model.Query.Add(new("redirect", "1"));
@@ -467,7 +467,7 @@ namespace Nop.Plugin.Payments.Ecommpay.Services
             //customer details
             if (customer != null)
             {
-                model.Query.Add(new("customer_email", customer.Email));
+                model.Query.Add(new("customer_email", customer.Email ?? string.Empty));
 
                 if (_customerSettings.FirstNameEnabled)
                 {
