@@ -454,7 +454,8 @@ namespace Nop.Plugin.Payments.Ecommpay.Services
 
             if (model.Errors.Count > 0)
                 return;
-
+            
+            model.Query.Add(new("interface_type", JsonConvert.SerializeObject(new { id = 28 })));
             model.Query.Add(new("payment_currency", storeCurrency.CurrencyCode));
             model.Query.Add(new("project_id", _ecommpayPaymentSettings.IsTestMode
                 ? Defaults.TestProjectId.ToString()
