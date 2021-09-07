@@ -571,7 +571,8 @@ namespace Nop.Plugin.Payments.Ecommpay.Services
                     var additionalParameters = QueryHelpers.ParseQuery(_ecommpayPaymentSettings.AdditionalParameters);
                     foreach (var param in additionalParameters)
                     {
-                        model.Query.TryAdd(param.Key, param.Value);
+                        if (!model.Query.TryAdd(param.Key, param.Value))
+                            model.Query[param.Key] = param.Value;
                     }
                 }
                 catch { }
