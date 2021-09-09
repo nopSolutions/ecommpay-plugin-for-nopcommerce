@@ -4,12 +4,68 @@
     Layout = "_ConfigurePlugin";
 }
 
+<style>
+    .ep_instructions a {
+        color: #15c;
+    }
+</style>
+
 @await Component.InvokeAsync("StoreScopeConfiguration")
 
 <form asp-controller="EcommpayConfiguration" asp-action="Configure" method="post">
     <div class="cards-group">
         <div class="card card-default">
             <div class="card-body">
+                <div class="ep_instructions">
+                    <ol>
+                        <li>
+                            <p>
+                                <span style="white-space:pre-wrap">
+                                    Sign up for your merchant account <a href="https://ecommpay.com/sign-up/?utm_source=nopcommerce&utm_medium=referral&utm_campaign=profile" target="_blank">now</a>
+                                </span>
+                            </p>
+                            <table cellspacing="0" style="width:100%;border-top:1px dotted rgb(200,200,200);border-bottom:1px dotted rgb(200,200,200)">
+                                <tbody>
+                                    <tr valign="top">
+                                        <td colspan="1" style="width: 250px; padding: 25px 20px 25px 0; ">
+                                            <a href="https://ecommpay.com/sign-up/?utm_source=nopcommerce&utm_medium=referral&utm_campaign=profile" style="display:table-cell;text-align:center" target="_blank">
+                                                <img width="250" height="130" style="display:inline-block;max-width:250px;max-height:250px;height:130px;width:250px;border-width:0px;vertical-align:bottom" src="~/Plugins/Payments.ECommPay/Areas/Admin/Content/ep_preview.jpg">
+                                            </a>
+                                        </td>
+                                        <td colspan="2" style="padding: 50px 0 25px 0;">
+                                            <div style="color:rgb(51,51,51);font-weight:400;font-size:21px;font-family:'wf_segoe-ui_light','Segoe UI Light','Segoe WP Light','Segoe UI','Segoe WP',Tahoma,Arial,sans-serif;line-height:21px">
+                                                <a href="https://ecommpay.com/sign-up/?utm_source=nopcommerce&utm_medium=referral&utm_campaign=profile" style="text-decoration:none" target="_blank">Sign Up for a Test Account | ECOMMPAY</a>
+                                            </div>
+                                            <div style="margin:70px 0px 16px;color:rgb(102,102,102);font-weight:400;font-family:wf_segoe-ui_normal,'Segoe UI','Segoe WP',Tahoma,Arial,sans-serif;font-size:14px;line-height:14px">
+                                                <a href="http://ecommpay.com" target="_blank">ecommpay.com</a>
+                                            </div>
+                                            <div style="display:block;color:rgb(102,102,102);font-weight:400;font-family:wf_segoe-ui_normal,'Segoe UI','Segoe WP',Tahoma,Arial,sans-serif;font-size:14px;line-height:20px;max-height:100px;overflow:hidden">
+                                                Signing up for ECOMMPAY's staging environment provides you with access to the Dashboard account and our API.
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br>
+                        </li>
+                        <li>
+                            <p style="max-width: 700px;">
+                                <span style="white-space:pre-wrap">
+                                    Explore how everything works in the test mode through your nopCommerce account
+                                    but please note, purchase status updates are only available while using your own project_id.&nbsp;
+                                </span>
+                            </p>
+                        </li>
+                        <li>
+                            <p style="max-width: 700px;">
+                                <span style="white-space:pre-wrap">
+                                    Start using the production environment through nopCommerce where no integrations
+                                    are needed and your selected payment methods will automatically appear on your payment page.&nbsp;
+                                </span>
+                            </p>
+                        </li>
+                    </ol>
+                </div>
                 <div class="form-group row">
                     <div class="col-md-3">
                         <nop-override-store-checkbox asp-for="IsTestMode_OverrideForStore" asp-input="IsTestMode" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
