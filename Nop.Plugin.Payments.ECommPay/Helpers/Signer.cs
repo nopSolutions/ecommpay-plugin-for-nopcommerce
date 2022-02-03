@@ -108,7 +108,7 @@ namespace Nop.Plugin.Payments.ECommPay.Helpers
 
         private static IDictionary<string, string> GetParametersFromJson(string json)
         {
-            JObject jObject = null;
+            JObject jObject;
             try
             {
                 jObject = JObject.Parse(json);

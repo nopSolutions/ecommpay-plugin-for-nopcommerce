@@ -16,6 +16,7 @@ using Nop.Services.Configuration;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Messages;
+using Nop.Services.Orders;
 using Nop.Services.Payments;
 using Nop.Services.Plugins;
 using Nop.Web.Framework.Infrastructure;
@@ -32,8 +33,8 @@ namespace Nop.Plugin.Payments.Ecommpay
         private readonly IActionContextAccessor _actionContextAccessor;
         private readonly ILocalizationService _localizationService;
         private readonly ILogger _logger;
-        private readonly IPaymentService _paymentService;
-        private readonly IPageHeadBuilder _pageHeadBuilder;
+        private readonly INopHtmlHelper _nopHtmlHelper;
+        private readonly IOrderTotalCalculationService _orderTotalCalculationService;
         private readonly INotificationService _notificationService;
         private readonly IUrlHelperFactory _urlHelperFactory;
         private readonly ISettingService _settingService;
@@ -50,8 +51,8 @@ namespace Nop.Plugin.Payments.Ecommpay
             IActionContextAccessor actionContextAccessor,
             ILocalizationService localizationService,
             ILogger logger,
-            IPaymentService paymentService,
-            IPageHeadBuilder pageHeadBuilder,
+            INopHtmlHelper nopHtmlHelper,
+            IOrderTotalCalculationService orderTotalCalculationService,
             INotificationService notificationService,
             IUrlHelperFactory urlHelperFactory,
             ISettingService settingService,
@@ -64,8 +65,8 @@ namespace Nop.Plugin.Payments.Ecommpay
             _actionContextAccessor = actionContextAccessor;
             _localizationService = localizationService;
             _logger = logger;
-            _paymentService = paymentService;
-            _pageHeadBuilder = pageHeadBuilder;
+            _nopHtmlHelper = nopHtmlHelper;
+            _orderTotalCalculationService = orderTotalCalculationService;
             _notificationService = notificationService;
             _urlHelperFactory = urlHelperFactory;
             _settingService = settingService;
@@ -135,7 +136,7 @@ namespace Nop.Plugin.Payments.Ecommpay
         /// <returns>The <see cref="Task"/> containing a additional handling fee</returns>
         public async Task<decimal> GetAdditionalHandlingFeeAsync(IList<ShoppingCartItem> cart)
         {
-            return await _paymentService.CalculateAdditionalFeeAsync(cart,
+            return await _orderTotalCalculationService.CalculatePaymentAdditionalFeeAsync(cart,
                 _ecommpayPaymentSettings.AdditionalFee, _ecommpayPaymentSettings.AdditionalFeePercentage);
         }
 
@@ -169,7 +170,7 @@ namespace Nop.Plugin.Payments.Ecommpay
             if (result.Success)
             {
                 //change error notification to warning
-                _pageHeadBuilder.AddCssFileParts(ResourceLocation.Head, @"~/Plugins/Payments.ECommPay/Areas/Admin/Content/styles.css", string.Empty);
+                _nopHtmlHelper.AddCssFileParts("~/Plugins/Payments.ECommPay/Areas/Admin/Content/styles.css");
 
                 return new RefundPaymentResult
                 {
@@ -290,7 +291,7 @@ namespace Nop.Plugin.Payments.Ecommpay
             }
 
             //locales
-            await _localizationService.AddLocaleResourceAsync(new Dictionary<string, string>
+            await _localizationService.AddOrUpdateLocaleResourceAsync(new Dictionary<string, string>
             {
                 ["Enums.Nop.Plugin.Payments.Ecommpay.Domain.PaymentFlowType.NewBrowserTab"] = "Open Payment Page in a separate browser tab",
                 ["Enums.Nop.Plugin.Payments.Ecommpay.Domain.PaymentFlowType.Iframe"] = "Open Payment Page embedded in a checkout",
@@ -325,7 +326,7 @@ namespace Nop.Plugin.Payments.Ecommpay
         /// Uninstall the plugin
         /// </summary>
         /// <returns>The <see cref="Task"/></returns>
-        public async override Task UninstallAsync()
+        public override async Task UninstallAsync()
         {
             //settings
             await _settingService.DeleteSettingAsync<EcommpayPaymentSettings>();
